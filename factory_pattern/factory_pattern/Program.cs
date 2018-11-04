@@ -9,4 +9,9 @@ namespace factory_pattern
             Console.WriteLine("Hello World!");
         }
     }
+
+    class Pizza {
+
+        public void create() { };
+    }
 }
