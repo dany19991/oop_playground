@@ -8,14 +8,13 @@ namespace factory_pattern
         {
             Console.WriteLine("Hello World!");
 
-            SimplePizzaFactory factory = new SimplePizzaFactory();
-            PizzaStore pizzaStore = new PizzaStore(factory);
+            PizzaStore pizzaStore = new NYPizzaStore();
             pizzaStore.OrderPizza("cheese");
             pizzaStore.OrderPizza("simple");
         }
     }
 
-    class Pizza
+    public class Pizza
     {
         public string pizzaName = "pizza";
 
@@ -25,7 +24,7 @@ namespace factory_pattern
         }
     }
 
-    class CheesePizza : Pizza
+    public class CheesePizza : Pizza
     {
         public CheesePizza()
         {
@@ -34,16 +33,32 @@ namespace factory_pattern
 
     }
 
-    class SimplePizzaFactory
+    public class ChicagoCheesePizza :Pizza
     {
-        public Pizza CreatePizza(string type)
+        public ChicagoCheesePizza(){
+            pizzaName = "ChCheesePizza";
+        }
+
+    }
+
+    class NYCheesePizza : Pizza
+    {
+        public NYCheesePizza (){
+            pizzaName = "NYCheesePizza";
+        }
+
+    }
+
+    class NYPizzaStore : PizzaStore
+    {
+        public override Pizza CreatePizza(string type)
         {
             Pizza pizza = null;
 
             switch (type)
             {
                 case "cheese":
-                    pizza = new CheesePizza(); /*new chesee pizza*/
+                    pizza = new NYCheesePizza(); /*new chesee pizza*/
                     break;
                 case "simple":
                     pizza = new Pizza();
@@ -54,24 +69,20 @@ namespace factory_pattern
         }
     }
 
-    class PizzaStore
+
+    public abstract class PizzaStore
     {
-        SimplePizzaFactory factory;
-
-        public PizzaStore(SimplePizzaFactory factory)
-        {
-            this.factory = factory;
-        }
-
         public Pizza OrderPizza(string type)
         {
             Pizza pizza;
 
-            pizza = factory.CreatePizza(type);
+            pizza = CreatePizza(type);
             pizza.create();
 
             return pizza;
         }
 
+
+        public abstract Pizza CreatePizza(string type);
     }
 }
