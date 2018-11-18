@@ -10,35 +10,83 @@ namespace factory_pattern
 
             PizzaStore pizzaStore = new NYPizzaStore();
             pizzaStore.OrderPizza("cheese");
-            pizzaStore.OrderPizza("simple");
+            pizzaStore.OrderPizza("clam");
         }
     }
 
-    public class Pizza
+    public abstract class Pizza
     {
         public string pizzaName = "pizza";
+        public Dough dough;
+        public Sauce sauce;
+        public Cheese cheese;
+        public Veggies[] veggies;
+        public Perroni perroni;
+        public Clams clams;
+
+        public abstract void prepare();
 
         public void create()
         {
             Console.WriteLine("Created a " + pizzaName);
         }
+        public void setName (string name)
+        {
+            this.pizzaName = name;
+        }
+        public string getName ()
+        {
+            return this.pizzaName;
+        }
     }
 
     public class CheesePizza : Pizza
     {
-        public CheesePizza()
+        PizzaIngredientsFactory pizzaIngredientsFactory;
+
+
+        public CheesePizza(PizzaIngredientsFactory ingredientsFactory)
         {
+            pizzaIngredientsFactory = ingredientsFactory;
             pizzaName = "cheesePizza";
         }
 
+        public override void prepare()
+        {
+            Console.WriteLine("Preparing " + pizzaName);
+            pizzaIngredientsFactory.createDough();
+            pizzaIngredientsFactory.createSauce();
+            pizzaIngredientsFactory.createCheese();
+        }
     }
 
+    public class ClamPizza : Pizza{
+        PizzaIngredientsFactory pizzaIngredientsFactory;
+
+        public ClamPizza (PizzaIngredientsFactory ingredientsFactory){
+            pizzaIngredientsFactory = ingredientsFactory;
+            pizzaName = "ClamPizza";
+        }
+
+        public override void prepare(){
+            Console.WriteLine("Preparing " + pizzaName);
+            pizzaIngredientsFactory.createDough();
+            pizzaIngredientsFactory.createSauce();
+            pizzaIngredientsFactory.createCheese();
+            pizzaIngredientsFactory.createClam();
+        }
+    }
+    /*
     public class ChicagoCheesePizza :Pizza
     {
         public ChicagoCheesePizza(){
             pizzaName = "ChCheesePizza";
         }
 
+        public override void prepare()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class NYCheesePizza : Pizza
@@ -47,24 +95,53 @@ namespace factory_pattern
             pizzaName = "NYCheesePizza";
         }
 
+        public override void prepare()
+        {
+            throw new NotImplementedException();
+        }
     }
-
+    */
     class NYPizzaStore : PizzaStore
     {
         public override Pizza CreatePizza(string type)
         {
             Pizza pizza = null;
-
+            PizzaIngredientsFactory ingredientsFactory = new NYPizzaIngredientFactory();
             switch (type)
             {
                 case "cheese":
-                    pizza = new NYCheesePizza(); /*new chesee pizza*/
+                    pizza = new CheesePizza(ingredientsFactory); /*new chesee pizza*/
                     break;
-                case "simple":
-                    pizza = new Pizza();
+                case "clam":
+                    pizza = new ClamPizza(ingredientsFactory);
+                    break;
+                default:
+                    pizza = null;
                     break;
             }
+            return pizza;
+        }
+    }
 
+    class ChPizzaStore : PizzaStore
+    {
+        public override Pizza CreatePizza(string type)
+        {
+            Pizza pizza = null;
+            PizzaIngredientsFactory ingredientsFactory = new ChPizzaIngredientFactory();
+            switch (type)
+            {
+                case "cheese":
+                    pizza = new CheesePizza(ingredientsFactory);
+                    pizza.setName("Chicago Cheese Pizza");
+                    break;
+                case "clam":
+                    pizza = new ClamPizza(ingredientsFactory);
+                    break;
+                default:
+                    pizza = null;
+                    break;
+            }
             return pizza;
         }
     }
@@ -82,7 +159,104 @@ namespace factory_pattern
             return pizza;
         }
 
-
         public abstract Pizza CreatePizza(string type);
+    }
+
+    public interface PizzaIngredientsFactory {
+        Dough createDough();
+        Sauce createSauce();
+        Cheese createCheese();
+        Veggies[] createVeggies();
+        Perroni createPerroni();
+        Clams createClam();
+    }
+
+    public class NYPizzaIngredientFactory : PizzaIngredientsFactory
+    {
+        public Cheese createCheese()
+        {
+            return new Cheese();
+        }
+
+        public Clams createClam()
+        {
+            return new Clams();
+        }
+
+        public Dough createDough()
+        {
+            return new Dough();
+        }
+
+        public Perroni createPerroni()
+        {
+            return new Perroni();
+        }
+
+        public Sauce createSauce()
+        {
+            return new Sauce();
+        }
+
+        public Veggies[] createVeggies()
+        {
+            return new Veggies[5];
+        }
+    }
+
+    public class ChPizzaIngredientFactory : PizzaIngredientsFactory
+    {
+        public Cheese createCheese()
+        {
+            return new Cheese();
+        }
+
+        public Clams createClam()
+        {
+            return new Clams();
+        }
+
+        public Dough createDough()
+        {
+            return new Dough();
+        }
+
+        public Perroni createPerroni()
+        {
+            return new Perroni();
+        }
+
+        public Sauce createSauce()
+        {
+            return new Sauce();
+        }
+
+        public Veggies[] createVeggies()
+        {
+            return new Veggies[5];
+        }
+    }
+
+    public class Veggies
+    {
+    }
+
+    public class Sauce
+    {
+    }
+
+    public class Perroni
+    {
+    }
+
+    public class Dough
+    {
+    }
+
+    public class Cheese
+    {
+    }
+    public class Clams
+    {
     }
 }
