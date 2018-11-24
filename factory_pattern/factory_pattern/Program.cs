@@ -29,6 +29,7 @@ namespace factory_pattern
         public void create()
         {
             Console.WriteLine("Created a " + pizzaName);
+            prepare();
         }
         public void setName (string name)
         {
@@ -44,7 +45,6 @@ namespace factory_pattern
     {
         PizzaIngredientsFactory pizzaIngredientsFactory;
 
-
         public CheesePizza(PizzaIngredientsFactory ingredientsFactory)
         {
             pizzaIngredientsFactory = ingredientsFactory;
@@ -54,9 +54,9 @@ namespace factory_pattern
         public override void prepare()
         {
             Console.WriteLine("Preparing " + pizzaName);
-            pizzaIngredientsFactory.createDough();
-            pizzaIngredientsFactory.createSauce();
-            pizzaIngredientsFactory.createCheese();
+            dough = pizzaIngredientsFactory.createDough();
+            sauce = pizzaIngredientsFactory.createSauce();
+            cheese = pizzaIngredientsFactory.createCheese();
         }
     }
 
@@ -70,10 +70,10 @@ namespace factory_pattern
 
         public override void prepare(){
             Console.WriteLine("Preparing " + pizzaName);
-            pizzaIngredientsFactory.createDough();
-            pizzaIngredientsFactory.createSauce();
-            pizzaIngredientsFactory.createCheese();
-            pizzaIngredientsFactory.createClam();
+            dough = pizzaIngredientsFactory.createDough();
+            sauce = pizzaIngredientsFactory.createSauce();
+            cheese  = pizzaIngredientsFactory.createCheese();
+            clams = pizzaIngredientsFactory.createClam();
         }
     }
     /*
@@ -239,24 +239,32 @@ namespace factory_pattern
 
     public class Veggies
     {
+        public Veggies() { Console.WriteLine("Created Veggies"); }
+
     }
 
     public class Sauce
     {
+        public Sauce() { Console.WriteLine("Created Sauce"); }
     }
 
     public class Perroni
     {
+        public Perroni() { Console.WriteLine("Created Perroni"); }
     }
 
     public class Dough
     {
+        public Dough() { Console.WriteLine("Created Dough"); }
     }
 
     public class Cheese
     {
+        public Cheese() { Console.WriteLine("Created Cheese"); }
     }
     public class Clams
     {
+        public Clams() { Console.WriteLine("Created Clams"); }
     }
 }
+
