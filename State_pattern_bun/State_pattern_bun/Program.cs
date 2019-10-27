@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,11 +11,12 @@ namespace State_pattern_bun
     {
         static void Main(string[] args)
         {
-            GumballMachine gumballMachine = new GumballMachine(5);
+            GumballMachine gumballMachine = new GumballMachine(10);
+
+            gumballMachine.getStatus();
 
             gumballMachine.insertQuarter();
             gumballMachine.turnCrank();
-            gumballMachine.getStatus();
 
             gumballMachine.getStatus();
 
@@ -33,6 +35,16 @@ namespace State_pattern_bun
             gumballMachine.getStatus();
 
             gumballMachine.insertQuarter();
+            gumballMachine.insertQuarter();
+            gumballMachine.turnCrank();
+            gumballMachine.insertQuarter();
+            gumballMachine.turnCrank();
+            gumballMachine.insertQuarter();
+            gumballMachine.turnCrank();
+            gumballMachine.insertQuarter();
+            gumballMachine.turnCrank();
+            gumballMachine.insertQuarter();
+            gumballMachine.turnCrank();
             gumballMachine.insertQuarter();
             gumballMachine.turnCrank();
             gumballMachine.insertQuarter();
@@ -62,6 +74,7 @@ public class GumballMachine
     HasQuarterState hasQuarterState;
     SoldState soldState;
     SoldOutState soldOutState;
+    WinnerState winnerState;
 
     public GumballMachine (int count)
     {
@@ -69,6 +82,7 @@ public class GumballMachine
         hasQuarterState = new HasQuarterState(this);
         soldState = new SoldState(this);
         soldOutState = new SoldOutState(this);
+        winnerState = new WinnerState(this);
         
         this.count = count;
 
@@ -80,16 +94,19 @@ public class GumballMachine
 
     public void insertQuarter()
     {
+        Console.WriteLine("InsertQuarter:");
         state.insertQuarter();
     }
 
     public void ejectQuarter()
     {
+        Console.WriteLine("EjectQuarter");
         state.ejectQuarter();
     }
 
     public void turnCrank()
     {
+        Console.WriteLine("TurnCrank");
         state.turnCrank(); //impreuna 
         state.dispense();
     }
@@ -116,14 +133,15 @@ public class GumballMachine
     {
         return soldState;
     }
+    public State getWinnerState()
+    {
+        return winnerState;
+    }
     
-    public void decreaseCount()
+    public void giveGumball()
     {
         count--;
-        if (count <= 0)
-        {
-            setState(getSoldOutState());
-        }else {}
+        Console.WriteLine("Here is your gumball");
     }
 
     public void getStatus()
@@ -148,8 +166,7 @@ public class SoldState :State
 
     public void dispense()
     {
-        gumballMachine.decreaseCount();
-        Console.WriteLine("Here is your gumball");
+        gumballMachine.giveGumball();
         if (gumballMachine.getCount() > 0)
         {
             gumballMachine.setState(gumballMachine.getNoQuarterState());
@@ -225,7 +242,6 @@ public class HasQuarterState : State
     public void ejectQuarter()
     {
         Console.WriteLine("Here is your quarter");
-        gumballMachine.decreaseCount();
         gumballMachine.setState(gumballMachine.getNoQuarterState());
     }
 
@@ -237,7 +253,15 @@ public class HasQuarterState : State
     public void turnCrank()
     {
         Console.WriteLine("You turned...");
-        gumballMachine.setState(gumballMachine.getSoldState());
+        Random random = new Random();
+        if (10 == random.Next(0, 11))
+        {
+            gumballMachine.setState(gumballMachine.getWinnerState());
+        }
+        else
+        {
+            gumballMachine.setState(gumballMachine.getSoldState());
+        }
     }
 }
 
@@ -267,5 +291,53 @@ public class SoldOutState : State
     public void turnCrank()
     {
         Console.WriteLine("You turned but there are no gumballs");
+    }
+}
+
+
+public class WinnerState : State
+{
+    GumballMachine gumballMachine;
+
+    public WinnerState(GumballMachine gumballMachine)
+    {
+        this.gumballMachine = gumballMachine;
+    }
+
+    public void dispense()
+    {
+        Console.WriteLine("----WINNER----");
+        gumballMachine.giveGumball();
+        if (gumballMachine.getCount() <= 0)
+        {
+            gumballMachine.setState(gumballMachine.getSoldOutState());
+        }
+        else
+        {
+            gumballMachine.giveGumball();
+            if (gumballMachine.getCount() <= 0)
+            {
+                gumballMachine.setState(gumballMachine.getSoldOutState());
+            }
+            else
+            {
+                gumballMachine.setState(gumballMachine.getNoQuarterState());
+            }
+        }
+    }
+
+    public void ejectQuarter()
+    {
+        Console.WriteLine("You already turned, you cannot get your quarter back now");
+    }
+
+    public void insertQuarter()
+    {
+        Console.WriteLine("You turned , you cannot insert a quarter right now");
+    }
+
+    public void turnCrank()
+    {
+        Console.WriteLine("Turning twice does not give more gumballs");
     }
 }
