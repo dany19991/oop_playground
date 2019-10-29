@@ -11,9 +11,8 @@ namespace Compound_pattern_1
         static void Main(string[] args)
         {
             DuckSimulator duckSimulator = new DuckSimulator();
-            duckSimulator.simulate();
-            
-
+            AbstractDuckFactory duckFactory = new DuckCountingFactory();
+            duckSimulator.simulate(duckFactory);
         }
     }
 }
@@ -57,12 +56,12 @@ public class RubberDuck : Quackable
 
 public class DuckSimulator
 {
-    public void simulate()
+    public void simulate( AbstractDuckFactory duckFactory)
     {
-        Quackable mallardDuck = new QuackCounter( new MallardDuck());
-        Quackable redheadDuck = new QuackCounter( new ReadheadDuck());
-        Quackable duckCall = new QuackCounter( new DuckCall());
-        Quackable rubberDuck = new QuackCounter( new RubberDuck());
+        Quackable mallardDuck = duckFactory.createMallardDuck();
+        Quackable redheadDuck = duckFactory.createRedheadDuck();
+        Quackable duckCall = duckFactory.createDuckCall();
+        Quackable rubberDuck = duckFactory.createRubberDuck();
         Goose goose = new Goose();
         Quackable gooseAdapter = new GooseAdapter(goose);
 
@@ -127,3 +126,58 @@ public class QuackCounter : Quackable
         return numberOfQuacks;
     }
 }
+
+public abstract class AbstractDuckFactory
+{
+    public abstract Quackable createMallardDuck();
+    public abstract Quackable createRedheadDuck();
+    public abstract Quackable createDuckCall();
+    public abstract Quackable createRubberDuck();
+}
+
+public class DuckFactory : AbstractDuckFactory
+{
+    public override Quackable createMallardDuck()
+    {
+        return new MallardDuck();
+    }
+
+    public override Quackable createRedheadDuck()
+    {
+        return new ReadheadDuck();
+    }
+
+    public override Quackable createDuckCall()
+    {
+        return new DuckCall();
+    }
+
+    public override Quackable createRubberDuck()
+    {
+        return new RubberDuck();
+    }
+}
+
+public class DuckCountingFactory : AbstractDuckFactory
+{
+    public override Quackable createMallardDuck()
+    {
+        return new QuackCounter(new MallardDuck());
+    }
+
+    public override Quackable createRedheadDuck()
+    {
+        return new QuackCounter(new ReadheadDuck());
+    }
+
+    public override Quackable createDuckCall()
+    {
+        return new QuackCounter(new DuckCall());
+    }
+
+    public override Quackable createRubberDuck()
+    {
+        return new QuackCounter(new RubberDuck());
+    }
+}
+
