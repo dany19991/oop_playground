@@ -65,13 +65,16 @@ public class DuckSimulator
         Goose goose = new Goose();
         Quackable gooseAdapter = new GooseAdapter(goose);
 
+        Flock flockOfDucks = new Flock();
+
+        flockOfDucks.add(mallardDuck);
+        flockOfDucks.add(redheadDuck);
+        flockOfDucks.add(duckCall);
+        flockOfDucks.add(rubberDuck);
+
         Console.WriteLine("Duck Simulator");
 
-        simulate(mallardDuck);
-        simulate(redheadDuck);
-        simulate(duckCall);
-        simulate(rubberDuck);
-        simulate(gooseAdapter);
+        simulate(flockOfDucks);
 
         Console.WriteLine(" The ducks quacked " + QuackCounter.getQaucks() + " times");
     }
@@ -181,3 +184,23 @@ public class DuckCountingFactory : AbstractDuckFactory
     }
 }
 
+public class Flock : Quackable
+{
+    List<Quackable> quackers = new List<Quackable>();
+
+    public void add(Quackable quacker)
+    {
+        quackers.Add(quacker);
+    }
+
+    public void quack()
+    {
+        IEnumerator<Quackable> enumerable = quackers.GetEnumerator();
+        while (enumerable.MoveNext())
+        {
+            Quackable quacker = enumerable.Current;
+            quacker.quack();
+        }
+
+    }
+}
