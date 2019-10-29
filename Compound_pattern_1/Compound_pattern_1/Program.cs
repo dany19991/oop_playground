@@ -12,6 +12,7 @@ namespace Compound_pattern_1
         {
             DuckSimulator duckSimulator = new DuckSimulator();
             duckSimulator.simulate();
+            
 
         }
     }
@@ -58,10 +59,10 @@ public class DuckSimulator
 {
     public void simulate()
     {
-        Quackable mallardDuck = new MallardDuck();
-        Quackable redheadDuck = new ReadheadDuck();
-        Quackable duckCall = new DuckCall();
-        Quackable rubberDuck = new RubberDuck();
+        Quackable mallardDuck = new QuackCounter( new MallardDuck());
+        Quackable redheadDuck = new QuackCounter( new ReadheadDuck());
+        Quackable duckCall = new QuackCounter( new DuckCall());
+        Quackable rubberDuck = new QuackCounter( new RubberDuck());
         Goose goose = new Goose();
         Quackable gooseAdapter = new GooseAdapter(goose);
 
@@ -72,6 +73,8 @@ public class DuckSimulator
         simulate(duckCall);
         simulate(rubberDuck);
         simulate(gooseAdapter);
+
+        Console.WriteLine(" The ducks quacked " + QuackCounter.getQaucks() + " times");
     }
 
     void simulate(Quackable duck)
@@ -100,5 +103,27 @@ public class GooseAdapter : Quackable
     public void quack()
     {
         goose.honk();
+    }
+}
+
+public class QuackCounter : Quackable
+{
+    Quackable duck;
+    static int numberOfQuacks;
+
+    public QuackCounter(Quackable duck)
+    {
+        this.duck = duck;
+    }
+
+    public void quack()
+    {
+        duck.quack();
+        numberOfQuacks++;
+    }
+
+    public static int getQaucks()
+    {
+        return numberOfQuacks;
     }
 }
