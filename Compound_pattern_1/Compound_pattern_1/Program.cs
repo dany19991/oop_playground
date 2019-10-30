@@ -17,40 +17,108 @@ namespace Compound_pattern_1
     }
 }
 
-public interface Quackable
+public interface Quackable:QuackObservable
 {
     void quack();
 }
 
 public class MallardDuck : Quackable
 {
+    QuackObservable observable;
+
+    public MallardDuck()
+    {
+        observable = new Observable(this);
+    }
+
     public void quack()
     {
         Console.WriteLine("Quack");
+        notifyObersevers();
+    }
+
+    public void registerObserver(Observer observer)
+    {
+        observable.registerObserver(observer);
+    }
+    public void notifyObersevers()
+    {
+        observable.notifyObersevers();
     }
 }
 
 public class ReadheadDuck : Quackable
 {
+    QuackObservable observable;
+
+    public ReadheadDuck()
+    {
+        observable = new Observable(this);
+    }
+
     public void quack()
     {
         Console.WriteLine("Quack");
+        notifyObersevers();
+    }
+
+    public void registerObserver(Observer observer)
+    {
+        observable.registerObserver(observer);
+    }
+    public void notifyObersevers()
+    {
+        observable.notifyObersevers();
     }
 }
 
 public class DuckCall : Quackable
 {
+    Observable observable;
+
+    public DuckCall()
+    {
+        observable = new Observable(this);
+    }
+
     public void quack()
     {
         Console.WriteLine("Kwak");
+        notifyObersevers();
+    }
+
+    public void registerObserver(Observer observer)
+    {
+        observable.registerObserver(observer);
+    }
+    public void notifyObersevers()
+    {
+        observable.notifyObersevers();
     }
 }
 
 public class RubberDuck : Quackable
 {
+    Observable observable;
+
+    public RubberDuck()
+    {
+        observable = new Observable(this);
+    }
+    
     public void quack()
     {
         Console.WriteLine("Squeak");
+        notifyObersevers();
+    }
+
+    public void registerObserver(Observer observer)
+    {
+        observable.registerObserver(observer);
+    }
+    public void notifyObersevers()
+    {
+        observable.notifyObersevers();
     }
 }
 
@@ -67,11 +135,17 @@ public class DuckSimulator
 
         Flock flockOfDucks = new Flock();
 
+        Quackologist quackologist = new Quackologist();
+        
         flockOfDucks.add(mallardDuck);
         flockOfDucks.add(redheadDuck);
         flockOfDucks.add(duckCall);
         flockOfDucks.add(rubberDuck);
 
+        //foarte important sa fie dupa ce am adaugat lez ducks ,
+        //inregistrarea observerului se face cu interator pt toate lez ducks existente
+        flockOfDucks.registerObserver(quackologist); 
+        
         Console.WriteLine("Duck Simulator");
 
         simulate(flockOfDucks);
@@ -102,9 +176,19 @@ public class GooseAdapter : Quackable
         this.goose = goose;
     }
 
+
     public void quack()
     {
         goose.honk();
+    }
+
+    public void registerObserver(Observer observer)
+    {
+        throw new NotImplementedException();
+    }
+    public void notifyObersevers()
+    {
+        throw new NotImplementedException();
     }
 }
 
@@ -127,6 +211,16 @@ public class QuackCounter : Quackable
     public static int getQaucks()
     {
         return numberOfQuacks;
+    }
+
+    public void registerObserver(Observer observer)
+    {
+        duck.registerObserver(observer); //important , se ajunge mai intai la decorator si dupa la obiectul efectiv
+    }
+
+    public void notifyObersevers()
+    {
+        duck.notifyObersevers(); //important , se ajunge mai intai la decorator si dupa la obiectul efectiv
     }
 }
 
@@ -192,7 +286,7 @@ public class Flock : Quackable
     {
         quackers.Add(quacker);
     }
-
+    
     public void quack()
     {
         IEnumerator<Quackable> enumerable = quackers.GetEnumerator();
@@ -201,6 +295,67 @@ public class Flock : Quackable
             Quackable quacker = enumerable.Current;
             quacker.quack();
         }
+    }
 
+    public void registerObserver(Observer observer)
+    {
+        //foarte important as parcurgem si sa face inregistrare la fiecare in parte
+        IEnumerator<Quackable> enumerable = quackers.GetEnumerator();
+        while (enumerable.MoveNext())
+        {
+            Quackable quacker = enumerable.Current;
+            quacker.registerObserver(observer);
+        }
+    }
+    public void notifyObersevers()
+    {
+        //observable.notifyObersevers();
+    }
+}
+
+public interface QuackObservable
+{
+    void registerObserver(Observer observer);
+    void notifyObersevers();
+}
+
+public class Observable : QuackObservable
+{
+    List<Observer> observers = new List<Observer>();
+    QuackObservable duck;
+
+    public Observable(QuackObservable duck)
+    {
+        this.duck = duck;
+    }
+
+    public void notifyObersevers()
+    {
+        //foreach (var observer in observers)
+        //{ observer.update(duck); }
+        IEnumerator<Observer> enumerable = observers.GetEnumerator();
+        while (enumerable.MoveNext())
+        {
+            Observer observer = enumerable.Current;
+            observer.update(duck);
+        }
+    }
+
+    public void registerObserver(Observer observer)
+    {
+        observers.Add(observer);
+    }
+}
+
+public interface Observer
+{
+    void update(QuackObservable duck);
+}
+
+public class Quackologist : Observer
+{
+    public void update(QuackObservable duck)
+    {
+        Console.WriteLine("quackologist: " + duck + " just quacked");
     }
 }
