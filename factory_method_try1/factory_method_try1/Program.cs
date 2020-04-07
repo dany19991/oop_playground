@@ -10,23 +10,42 @@ namespace factory_method_try1
     {
         static void Main(string[] args)
         {
-            Logistics myLogistics = new Logistics();
+            Logistics myLogistics = new Logistics("terestrial");
+            Logistics mySeaLogistics = new Logistics("maritim");
+            
             int[] payload1 = { 1 };int[] payload2 = { 2};
 
-            myLogistics.CreataTransport("start1", "dest1", payload1);
-            myLogistics.CreataTransport("start2", "dest2", payload2);
+            myLogistics.CreateTransport("start1", "dest1", payload1);
+            myLogistics.CreateTransport("start2", "dest2", payload2);
+            mySeaLogistics.CreateTransport("start3", "dest3", payload2);
 
             myLogistics.DisplayTransports();
+            mySeaLogistics.DisplayTransports();
         }
 
         class Logistics
         {
-            List<Truck> trucks = new List<Truck>();
+            private string mLogisticsType= "none";
 
-            public void CreataTransport (string start, string dest, int[] payload)
+            List<Truck> trucks = new List<Truck>();
+            List<Boat> boats = new List<Boat>();
+
+            public Logistics ( string logisticsType)
             {
-                Truck truck = new Truck(start, dest, payload);
-                trucks.Add(truck);
+                mLogisticsType = logisticsType;
+            }
+
+            public void CreateTransport (string start, string dest, int[] payload)
+            {
+                if (mLogisticsType == "terestrial" || mLogisticsType == "none")
+                {
+                    Truck truck = new Truck(start, dest, payload);
+                    trucks.Add(truck);
+                } else if (mLogisticsType == "maritim")
+                {
+                    Boat boat = new Boat(start, dest, payload);
+                    boats.Add(boat);
+                }
             }
 
             public void DisplayTransports()
@@ -35,14 +54,18 @@ namespace factory_method_try1
                 {
                     trucks[i].displayTruck();
                 }
+                for (int i = 0; i < boats.Count; i++)
+                {
+                    boats[i].displayTruck();
+                }
             }
         }
 
         class Truck
         {
-            private string mDestination="none";
-            private string mStartLocation = "none";
-            private int[] mPayload = { 0 };
+            protected string mDestination="none";
+            protected string mStartLocation = "none";
+            protected int[] mPayload = { 0 };
 
             public Truck (string start , string dest, int[] payload)
             {
@@ -52,23 +75,38 @@ namespace factory_method_try1
             }
             
             public void setDestination ( string dest)
-            {
-                mDestination = dest;
-            }
+            { mDestination = dest; }
 
             public void setStartLocation (string start)
-            {
-                mStartLocation = start;
-            }
+            { mStartLocation = start; }
 
             public void setPayload(int []payload)
-            {
-                mPayload = payload;
+            { mPayload = payload; }
+            public virtual void displayTruck()
+            { Console.WriteLine("Truck: Start:" + mStartLocation + " , Dest:" + mDestination + " , Payload:" + mPayload.ToString());
             }
-            public void displayTruck()
-            {
-                Console.WriteLine("Start:" + mStartLocation + " , Dest:" + mDestination + " , Payload:" + mPayload.ToString());
+
+            public virtual void deliver()
+            { Console.WriteLine("Truck delivering from:" + mStartLocation + " to: " + mDestination + " the following: " + mPayload);
             }
         }
+
+        class Boat : Truck
+        {
+            public Boat(string start, string dest, int[] payload) : base(start, dest, payload)
+            {
+            }
+            public virtual void displayBoat()
+            {
+                Console.WriteLine("Boat: Start:" + mStartLocation + " , Dest:" + mDestination + " , Payload:" + mPayload.ToString());
+            }
+
+            override
+            public void deliver()
+            {
+                Console.WriteLine("boat delivering from:" + mStartLocation + " to: " + mDestination + " the following: " + mPayload);
+            }
+        }
+
     }
 }
