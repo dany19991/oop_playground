@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
 
 namespace factory_pattern_try2
 {
@@ -9,16 +10,46 @@ namespace factory_pattern_try2
         {
             Console.WriteLine("Hello World!");
 
-            PizzaStore NYpizzaStore = new NYPizzaStore();
-            Pizza pizza  = NYpizzaStore.orderPizza("cheese");
-            PizzaStore ChpizzaStore = new ChPizzaStore();
-            Pizza pizza1 = ChpizzaStore.orderPizza("greek");
+            PizzaStore NYPizzaStore = new NYPizzaStore();
+            Pizza pizza  = NYPizzaStore.orderPizza("cheese");
+            System.Console.WriteLine(pizza.Name);
+            PizzaStore ChPizzaStore = new ChPizzaStore();
+            Pizza pizza1 = ChPizzaStore.orderPizza("greek");
+        }
+    }
 
+    public class Dough { }
+    public class Sauce { }
+    public class Topping { }
+    public class Pepperoni : Topping { }
+    public class Jalpenio: Topping { }
+
+
+    public interface IngredientsAbstractFactory
+    {
+        public Dough createDough();
+        public Sauce createSauce();
+        public Topping[] createToppings();
+    }
+
+    public class NYIngredients : IngredientsAbstractFactory //
+    {
+        public Dough createDough()
+        { return new Dough(); //poate fi extins, sa fie un tip de aluat special
+        }
+        public Sauce createSauce()
+        { return new Sauce();
+        }
+        public Topping[] createToppings()
+        {
+            Topping[] toppings = { new Topping(),new Jalpenio(), new Pepperoni() };
+            return toppings;
         }
     }
 
     public abstract class PizzaStore
     {
+
         public Pizza orderPizza(string type)
         {
             Pizza pizza =createPizza(type);
@@ -39,10 +70,12 @@ namespace factory_pattern_try2
         public override Pizza createPizza(string type)
         {
             Pizza pizza = null;
-
+            IngredientsAbstractFactory ingredientsAbstractFactory = new NYIngredients();
+            
             if (type.Equals("cheese"))
             {
-                pizza = new NYCheesePizza();
+                pizza = new CheesePizza(ingredientsAbstractFactory);
+                pizza.Name = "NY " + pizza.Name;
             }
             else if (type.Equals("greek"))
             {
@@ -81,9 +114,16 @@ namespace factory_pattern_try2
     }
 
 
-    public class Pizza
+    public abstract class Pizza
     {
-        public virtual void prepare() {Console.WriteLine("classic pizza"); } 
+        private String name;
+        protected Dough dough;
+        protected Sauce sauce;
+        protected Topping[] toppings;
+
+        public string Name { get => name; set => name = value; }
+
+        public abstract void prepare();// {Console.WriteLine("classic pizza"); } 
         //daca vreau sa suprascriu o functie in clasele derivate 
         //trebuie sa fie cel putin virtuala (poate avea implmenetare si in clasa de baza
         public void bake() { }
@@ -93,7 +133,16 @@ namespace factory_pattern_try2
 
     public class CheesePizza : Pizza
     {
-        public override void prepare() { Console.WriteLine("cheese pizza");}
+        IngredientsAbstractFactory ingredientsAbstractFactory; //controlez din factory ce ingrediente sa contina, si factory zice pt ce zona 
+        //astfel nu mai trebuie cate un tip de cheese pizza pentru fiecare oras 
+        public CheesePizza (IngredientsAbstractFactory ingredientsAbstractFactory_)
+        { ingredientsAbstractFactory = ingredientsAbstractFactory_; }
+        public override void prepare() { 
+            Name = "cheese pizzaa";
+            dough = ingredientsAbstractFactory.createDough();
+            sauce = ingredientsAbstractFactory.createSauce();
+            toppings = ingredientsAbstractFactory.createToppings();
+        }
     }
 
     public class GreekPizza : Pizza
@@ -114,16 +163,14 @@ namespace factory_pattern_try2
     {
         public override void prepare() { Console.WriteLine("NY greek pizza"); }
     }
-        public class ChPizza :Pizza
+    public class ChPizza :Pizza
     {
         public override void prepare() { Console.WriteLine("Chicago pizza"); }
     }
-
     public class ChCheesePizza : Pizza
     {
         public override void prepare() { Console.WriteLine("Chicago cheese pizza"); }
     }
-
     public class ChGreekPizza : Pizza
     {
         public override void prepare() { Console.WriteLine("Chicago greek pizza"); }
